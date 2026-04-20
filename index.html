@@ -1,100 +1,45 @@
-<div class="time-row">
-        <button class="t-btn active" onclick="setTime(30, this)">30s</button>
-        <button class="t-btn" onclick="setTime(60, this)">1m</button>
-        <button class="t-btn" onclick="setTime(180, this)">3m</button>
-        <button class="t-btn" onclick="setTime(300, this)">5m</button>
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DREAM X TRADING</title>
+    <style>
+        body { background-color: #0b0e11; color: white; font-family: Arial, sans-serif; margin: 0; text-align: center; }
+        .header { padding: 15px; font-size: 20px; font-weight: bold; border-bottom: 1px solid #2b2f36; }
+        #chart-container { height: 400px; width: 100%; }
+        .controls { padding: 20px; display: flex; justify-content: space-around; }
+        .btn { padding: 15px 40px; border: none; border-radius: 5px; font-size: 18px; cursor: pointer; font-weight: bold; }
+        .buy { background-color: #2ebd85; color: white; }
+        .sell { background-color: #f6465d; color: white; }
+    </style>
+</head>
+<body>
+    <div class="header">DREAM X TRADING</div>
+    
+    <div id="chart-container">
+        <div class="tradingview-widget-container" style="height:100%;width:100%">
+          <div id="tradingview_chart" style="height:calc(100% - 32px);width:100%"></div>
+          <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+          <script type="text/javascript">
+          new TradingView.widget({
+            "autosize": true, "symbol": "BINANCE:BTCUSDT", "interval": "1", "timezone": "Etc/UTC",
+            "theme": "dark", "style": "1", "locale": "en", "toolbar_bg": "#f1f3f6",
+            "enable_publishing": false, "hide_side_toolbar": false, "allow_symbol_change": true,
+            "container_id": "tradingview_chart"
+          });
+          </script>
+        </div>
     </div>
-    <input type="number" id="trade-amt" placeholder="Enter Amount (₹)">
-    <div class="btn-group">
-        <button class="btn up" onclick="placeTrade('UP')">UP</button>
-        <button class="btn down" onclick="placeTrade('DOWN')">DOWN</button>
+
+    <div class="controls">
+        <button class="btn buy">BUY</button>
+        <button class="btn sell">SELL</button>
     </div>
-</div>
 
-<div class="history-section">
-    <div style="color: #848e9c; font-weight:bold; margin-bottom:10px;">CLOSED TRADES</div>
-    <div id="history-list"></div>
-</div>
-
-<script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-<script>
-    let balance = 1000;
-    let selectedTime = 30;
-
-    // 1. Live Candle Timer Logic
-    function startCandleTimer() {
-        setInterval(() => {
-            let now = new Date();
-            let secondsLeft = 60 - now.getSeconds();
-            let displaySec = secondsLeft < 10 ? '0' + secondsLeft : secondsLeft;
-            document.getElementById('candle-clock').innerText = 00:${displaySec};
-        }, 1000);
-    }
-    startCandleTimer();
-
-    new TradingView.widget({
-        "autosize": true,
-        "symbol": "BINANCE:BTCUSDT",
-        "interval": "1",
-        "theme": "dark",
-        "container_id": "tv_chart",
-        "hide_top_toolbar": true,
-        "hide_legend": true,
-        "disabled_features": ["volume_force_overlay", "create_volume_indicator_by_default"]
-    });
-
-    function setTime(sec, btn) {
-        selectedTime = sec;
-        document.querySelectorAll('.t-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-    }
-
-    function placeTrade(dir) {
-        let val = document.getElementById('trade-amt').value;
-        if(!val) return alert("Enter amount!");
-        let amt = parseFloat(val);
-        if(amt > balance) return alert("Low balance!");
-        
-        balance -= amt; updateUI();
-        document.getElementById('strike-line').style.display = 'block';
-
-        let t = selectedTime;
-        let cd = setInterval(() => {
-            t--;
-            document.getElementById('timer-label').innerText = t + "s";
-            if(t <= 0) {
-                clearInterval(cd);
-                document.getElementById('strike-line').style.display = 'none';
-                let win = Math.random() > 0.5;
-                if(win) balance += (amt * 1.88);
-                showPopup(win, win ? (amt * 1.88) : amt);
-                addHistory(dir, amt, win, win ? (amt * 1.88) : 0);
-            }
-        }, 1000);
-    }
-
-    function addHistory(dir, amt, win, profit) {
-        const list = document.getElementById('history-list');
-        const item = document.createElement('div');
-        item.className = 'hist-item';
-        item.innerHTML = <span><b>${dir}</b> ₹${amt}</span><span style="color:${win?'#00c076':'#ff3b5c'}">${win?'+₹'+profit.toFixed(2):'-₹'+amt}</span>;
-        list.prepend(item);
-    }
-
-    function showPopup(win, amt) {
-        const val = document.getElementById('res-value');
-        val.innerText = win ? "+₹" + amt.toFixed(2) : "₹0.00";
-        val.style.color = win ? "#00c076" : "#ff3b5c";
-        document.getElementById('res-popup').style.display = 'block';
-        document.getElementById('fade').style.display = 'block';
-        updateUI();
-        setTimeout(() => {
-            document.getElementById('res-popup').style.display = 'none';
-            document.getElementById('fade').style.display = 'none';
-        }, 5000);
-    }
-
-    function updateUI() { document.getElementById('bal-display').innerText = "₹ " + balance.toFixed(2); }
-</script>
+    <script>
+        document.querySelector('.buy').onclick = () => alert('Trade Placed: Buy');
+        document.querySelector('.sell').onclick = () => alert('Trade Placed: Sell');
+    </script>
 </body>
 </html>
